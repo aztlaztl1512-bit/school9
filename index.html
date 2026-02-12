@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار التناظر اللفظي - ثانوية الأمير عبدالمجيد</title>
+    <style>
+        :root { --primary: #2c3e50; --secondary: #3498db; --success: #27ae60; --danger: #e74c3c; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; margin: 0; padding: 20px; color: #333; }
+        .container { max-width: 700px; margin: auto; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .header { text-align: center; border-bottom: 2px solid #eee; margin-bottom: 20px; padding-bottom: 10px; }
+        .school-name { color: var(--secondary); font-weight: bold; font-size: 1.2em; }
+        .student-board { background: #ecf0f1; padding: 10px; border-radius: 10px; margin-bottom: 20px; display: none; border-right: 5px solid var(--secondary); }
+        .question-card { display: none; }
+        .question-card.active { display: block; }
+        .progress-bar { font-size: 0.9em; color: #666; margin-bottom: 15px; }
+        .options-list { list-style: none; padding: 0; }
+        .options-list li { margin: 12px 0; padding: 15px; border: 1px solid #ddd; border-radius: 10px; cursor: pointer; transition: 0.3s; }
+        .options-list li:hover { background: #f7f9f9; border-color: var(--secondary); }
+        .options-list li.selected { background: var(--secondary); color: white; border-color: var(--secondary); }
+        button { width: 100%; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; transition: 0.3s; }
+        .btn-start { background: var(--success); color: white; }
+        .btn-next { background: var(--primary); color: white; margin-top: 20px; }
+        .feedback { margin-top: 15px; padding: 15px; border-radius: 10px; display: none; font-size: 0.95em; }
+        .summary-item { border-bottom: 1px solid #eee; padding: 10px 0; }
+        .correct-text { color: var(--success); font-weight: bold; }
+        .wrong-text { color: var(--danger); font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container" id="main-container">
+    <div class="header">
+        <h2>اختبار التناظر اللفظي 📝✨</h2>
+        <p class="school-name">ثانوية الأمير عبدالمجيد مع فيس تعبيري 🏫🎓</p>
+    </div>
+
+    <div id="start-screen">
+        <p>مرحباً بك في الاختبار. يرجى إدخال اسمك للبدء:</p>
+        <input type="text" id="student-name-input" placeholder="اكتب اسمك هنا..." style="width: 95%; padding: 12px; margin-bottom: 20px; border-radius: 8px; border: 1px solid #ccc;">
+        <button class="btn-start" onclick="startQuiz()">ابدأ الاختبار الآن 🚀</button>
+    </div>
+
+    <div id="student-board" class="student-board">
+        مرحباً بالطالب: <span id="display-student-name" style="font-weight: bold;"></span> 👋
+    </div>
+
+    <div id="quiz-area" style="display: none;">
+        <div id="question-container"></div>
+        <button id="next-btn" class="btn-next" onclick="handleNext()" style="display: none;">السؤال التالي ⬅️</button>
+    </div>
+
+    <div id="result-screen" style="display: none;">
+        <h3 style="text-align: center;">انتهى الاختبار! 🏁</h3>
+        <div id="score-display" style="text-align: center; font-size: 1.5em; margin-bottom: 20px;"></div>
+        <div id="summary-details"></div>
+    </div>
+</div>
+
+<script>
+const questions = [
+    { q: "رئة : تنفس", options: ["قلب : ضخ", "معدة : هضم", "عين : رؤية", "أذن : سماع"], correct: 0, reason: "علاقة وظيفية: الرئة وظيفتها التنفس والقلب وظيفته الضخ." },
+    { q: "غابة : أشجار", options: ["مدرسة : طلاب", "كتاب : صفحات", "مدينة : بيوت", "ملعب : لاعبون"], correct: 1, reason: "علاقة احتواء: الكتاب يحتوي على صفحات كما الغابة تحتوي أشجاراً." },
+    { q: "شمس : ضياء", options: ["قمر : ليل", "نار : حرارة", "ورد : عطر", "نحل : عسل"], correct: 1, reason: "علاقة مصدرية: الشمس مصدر الضياء والنار مصدر الحرارة." },
+    { q: "منزل : غرف", options: ["شجرة : غصن", "جامعة : أقسام", "فصل : طلاب", "سيارة : عجلات"], correct: 1, reason: "علاقة كل بجزء: الجامعة تتكون من أقسام والمنزل من غرف." },
+    { q: "جندي : سلاح", options: ["طبيب : سماعة", "نجار : خشب", "فلاح : منجل", "كاتب : قلم"], correct: 3, reason: "علاقة الأداة: القلم أداة الكاتب والسلاح أداة الجندي." },
+    // ملاحظة: يمكنك تكرار هذه الهيكلية لإضافة حتى 25 سؤالاً.
+    { q: "ماء : حياة", options: ["نوم : راحة", "طعام : نمو", "هواء : تنفس", "مذاكرة : نجاح"], correct: 3, reason: "علاقة سببية: المذاكرة تؤدي للنجاح والماء سبب للحياة." }
+    // أضف المزيد هنا بنفس التنسيق...
+];
+
+let currentIdx = 0;
+let score = 0;
+let userAnswers = [];
+let studentName = "";
+
+// منع إعادة الاختبار
+if (localStorage.getItem('quiz_done_user')) {
+    document.getElementById('start-screen').innerHTML = "<h3>لقد أديت هذا الاختبار مسبقاً! 🚫</h3><p>لا يسمح بالنظام بأداء الاختبار أكثر من مرة من نفس الجهاز.</p>";
+}
+
+function startQuiz() {
+    studentName = document.getElementById('student-name-input').value.trim();
+    if (studentName === "") return alert("من فضلك اكتب اسمك أولاً!");
+
+    document.getElementById('start-screen').style.display = "none";
+    document.getElementById('student-board').style.display = "block";
+    document.getElementById('display-student-name').innerText = studentName;
+    document.getElementById('quiz-area').style.display = "block";
+    
+    showQuestion();
+}
+
+function showQuestion() {
+    const qData = questions[currentIdx];
+    const container = document.getElementById('question-container');
+    
+    container.innerHTML = `
+        <div class="progress-bar">السؤال ${currentIdx + 1} من ${questions.length}</div>
+        <h3>${qData.q}</h3>
+        <ul class="options-list">
+            ${qData.options.map((opt, i) => `<li onclick="selectOption(this, ${i})">${opt}</li>`).join('')}
+        </ul>
+        <div id="fb" class="feedback"></div>
+    `;
+    document.getElementById('next-btn').style.display = "none";
+}
+
+function selectOption(el, index) {
+    const allOptions = document.querySelectorAll('.options-list li');
+    allOptions.forEach(li => li.style.pointerEvents = "none");
+    el.classList.add('selected');
+
+    const qData = questions[currentIdx];
+    const fb = document.getElementById('fb');
+    const isCorrect = index === qData.correct;
+
+    userAnswers.push({ question: qData.q, selected: qData.options[index], correct: qData.options[qData.correct], isCorrect, reason: qData.reason });
+
+    if (isCorrect) {
+        score++;
+        fb.innerHTML = "✅ إجابة صحيحة! " + qData.reason;
+        fb.style.background = "#d4edda";
+    } else {
+        fb.innerHTML = "❌ إجابة خاطئة. الصحيح: " + qData.options[qData.correct] + "<br>" + qData.reason;
+        fb.style.background = "#f8d7da";
+    }
+    
+    fb.style.display = "block";
+    document.getElementById('next-btn').style.display = "block";
+}
+
+function handleNext() {
+    currentIdx++;
+    if (currentIdx < questions.length) {
+        showQuestion();
+    } else {
+        showResults();
+    }
+}
+
+function showResults() {
+    document.getElementById('quiz-area').style.display = "none";
+    document.getElementById('result-screen').style.display = "block";
+    localStorage.setItem('quiz_done_user', 'true');
+
+    document.getElementById('score-display').innerText = `النتيجة النهائية: ${score} من ${questions.length}`;
+
+    let summaryHtml = "<h4>ملخص الإجابات لكل سؤال:</h4>";
+    userAnswers.forEach((ans, i) => {
+        summaryHtml += `
+            <div class="summary-item">
+                <strong>س${i+1}: ${ans.question}</strong><br>
+                إجابتك: <span class="${ans.isCorrect ? 'correct-text' : 'wrong-text'}">${ans.selected}</span><br>
+                ${!ans.isCorrect ? `الصحيحة: <span class="correct-text">${ans.correct}</span><br>` : ''}
+                <small>الشرح: ${ans.reason}</small>
+            </div>
+        `;
+    });
+    document.getElementById('summary-details').innerHTML = summaryHtml;
+}
+</script>
+
+</body>
+</html>
