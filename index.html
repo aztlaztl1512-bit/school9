@@ -5,28 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>اختبار التناظر اللفظي - أ/ عبدالعزيز الفيفي</title>
     <style>
-        :root { --primary: #2c3e50; --secondary: #3498db; --success: #27ae60; --danger: #e74c3c; --accent: #f39c12; }
+        :root { --primary: #2c3e50; --secondary: #3498db; --success: #27ae60; --danger: #e74c3c; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f7f6; margin: 0; padding: 20px; color: #333; }
-        .container { max-width: 800px; margin: auto; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-top: 8px solid var(--secondary); position: relative; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-top: 8px solid var(--secondary); }
         .header { text-align: center; margin-bottom: 30px; }
-        .header h1 { color: var(--primary); font-size: 2.2em; margin-bottom: 5px; }
         .school-info { font-size: 1.3em; color: var(--secondary); font-weight: bold; }
-        .student-board { background: #e8f4fd; padding: 15px; border-radius: 12px; margin-bottom: 25px; border-right: 6px solid var(--secondary); font-size: 1.1em; display: flex; justify-content: space-between; align-items: center; }
-        .timer-box { font-weight: bold; font-size: 1.2em; padding: 5px 15px; border-radius: 8px; background: white; border: 2px solid var(--secondary); min-width: 80px; text-align: center; }
-        .timer-warn { color: var(--danger); border-color: var(--danger); animation: blink 0.8s infinite; }
+        .student-board { background: #e8f4fd; padding: 15px; border-radius: 12px; margin-bottom: 25px; border-right: 6px solid var(--secondary); display: flex; justify-content: space-between; align-items: center; }
+        .timer-display { font-weight: bold; font-size: 1.4em; color: var(--primary); background: white; padding: 5px 15px; border-radius: 8px; border: 2px solid var(--secondary); }
+        .timer-warning { color: var(--danger); border-color: var(--danger); animation: blink 0.8s infinite; }
         @keyframes blink { 50% { opacity: 0.5; } }
-        .progress { color: #888; margin-bottom: 10px; font-weight: bold; }
-        .question-box h3 { background: #f9f9f9; padding: 20px; border-radius: 10px; border: 1px dashed #ccc; margin-top: 0; }
+        .question-box h3 { background: #f9f9f9; padding: 20px; border-radius: 10px; border: 1px dashed #ccc; }
         .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; list-style: none; padding: 0; }
-        .options-grid li { padding: 15px; border: 2px solid #eee; border-radius: 12px; cursor: pointer; transition: all 0.2s; text-align: center; font-weight: 500; }
+        .options-grid li { padding: 15px; border: 2px solid #eee; border-radius: 12px; cursor: pointer; text-align: center; transition: 0.2s; }
         .options-grid li:hover { border-color: var(--secondary); background: #f0f8ff; }
-        .options-grid li.selected { background: var(--secondary); color: white; border-color: var(--secondary); }
-        .feedback { margin-top: 20px; padding: 20px; border-radius: 12px; display: none; line-height: 1.6; }
-        .btn { width: 100%; padding: 15px; border: none; border-radius: 10px; cursor: pointer; font-size: 18px; font-weight: bold; transition: 0.3s; margin-top: 20px; }
+        .options-grid li.selected { background: var(--secondary); color: white; }
+        .feedback { margin-top: 20px; padding: 20px; border-radius: 12px; display: none; }
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 10px; cursor: pointer; font-size: 18px; font-weight: bold; margin-top: 20px; }
         .btn-start { background: var(--success); color: white; }
         .btn-next { background: var(--primary); color: white; }
-        .summary-card { border-bottom: 1px solid #eee; padding: 15px 0; }
-        .footer-note { text-align: center; margin-top: 30px; padding-top: 20px; border-top: 2px solid #eee; font-style: italic; color: var(--primary); }
+        .footer-note { text-align: center; margin-top: 30px; padding-top: 20px; border-top: 2px solid #eee; font-style: italic; }
     </style>
 </head>
 <body>
@@ -39,15 +36,15 @@
     </div>
 
     <div id="start-screen">
-        <p style="text-align: center; font-size: 1.2em;">مرحباً بك يا بطل.. لديك 30 ثانية لكل سؤال، بالتوفيق!</p>
-        <input type="text" id="name-input" placeholder="اكتب اسمك الثلاثي..." style="width: 100%; padding: 15px; box-sizing: border-box; border-radius: 10px; border: 2px solid #ddd; margin-bottom: 20px; font-size: 16px;">
+        <p style="text-align: center;">مرحباً بك يا بطل.. أدخل اسمك لبدء الاختبار (30 ثانية لكل سؤال):</p>
+        <input type="text" id="name-input" placeholder="اكتب اسمك هنا..." style="width: 100%; padding: 15px; border-radius: 10px; border: 2px solid #ddd; margin-bottom: 20px;">
         <button class="btn btn-start" onclick="initQuiz()">ابدأ الاختبار الآن 🚀</button>
     </div>
 
     <div id="quiz-ui" style="display:none;">
         <div class="student-board">
             <span id="student-tag"></span>
-            <div id="timer" class="timer-box">30 ث</div>
+            <div id="timer-text" class="timer-display">30 ث</div>
         </div>
         <div id="quiz-content"></div>
         <button id="next-btn" class="btn btn-next" onclick="nextQuestion()" style="display:none;">السؤال التالي ⬅️</button>
@@ -57,7 +54,10 @@
         <h2 style="text-align: center; color: var(--success);">اكتمل الاختبار! 🏁</h2>
         <div id="score-box" style="text-align: center; font-size: 1.8em; margin: 20px 0; font-weight: bold;"></div>
         <div id="summary-list"></div>
-        <div class="footer-note" id="final-footer"></div>
+        <div class="footer-note">
+            مع تمنياتي لك بمزيد من التقدم والنجاح 🌟<br>
+            <strong>أ / عبدالعزيز الفيفي</strong>
+        </div>
     </div>
 </div>
 
@@ -71,22 +71,22 @@ const quizData = [
     { q: "محراب : مسجد", a: ["منبر : خطبة", "دفة : سفينة", "نافذة : غرفة", "باب : منزل"], c: 1, r: "علاقة جزء من كل (صدري): المحراب جزء في مقدمة المسجد والدفة جزء في مقدمة السفينة." },
     { q: "وسامة : جمال", a: ["قوة : شجاعة", "ذكاء : فطنة", "طول : عرض", "سرعة : حركة"], c: 1, r: "علاقة ترادف: الوسامة هي الجمال والذكاء هو الفطنة." },
     { q: "عجين : خبز", a: ["دقيق : قمح", "نخلة : رطب", "ماء : ثلج", "خشب : كرسي"], c: 2, r: "علاقة تحول: العجين يتحول لخبز والماء يتحول لثلج." },
-    { q: "بؤس : شقاء", a: ["غنى : ثراء", "فرح : سرور", "حزن : ألم", "خوف : قلق"], c: 0, r: "علاقة ترادف (تأكيد): البؤس هو الشقاء والغنى هو الثراء." },
+    { q: "بؤس : شقاء", a: ["غنى : ثراء", "فرح : سرور", "حزن : ألم", "خوف : قلق"], c: 0, r: "علاقة ترادف: البؤس هو الشقاء والغنى هو الثراء." },
     { q: "ساعة : وقت", a: ["ميزان : ثقل", "بوصلة : اتجاه", "مسطرة : طول", "ترمومتر : حرارة"], c: 1, r: "علاقة آلة القياس: الساعة تقيس الوقت والبوصلة تحدد الاتجاه." },
-    { q: "مِنجل : فلاح", a: ["مشرط : طبيب", "قلم : كاتب", "سيف : محارب", "مطرقة : حداد"], c: 3, r: "علاقة الأداة بصاحبها (مهنة): المنجل للفلاح والمطرقة للحداد." },
-    { q: "غمد : سيف", a: ["عرين : أسد", "خاتم : إصبع", "جورب : قدم", "حقيبة : كتب"], c: 0, r: "علاقة احتواء/مكانية: الغمد بيت السيف والعرين بيت الأسد." },
-    { q: "إهمال : فشل", a: ["ممارسة : إتقان", "سرعة : حادث", "توفير : غنى", "قراءة : ثقافة"], c: 1, r: "علاقة سببية (سلبية غالباً): الإهمال يؤدي للفشل والسرعة تؤدي للحادث." },
-    { q: "نحل : عسل", a: ["بقرة : حليب", "دجاج : بيض", "غنم : صوف", "دودة : حرير"], c: 3, r: "علاقة نتاج (طبيعي): النحل ينتج العسل ودودة القز تنتج الحرير." },
-    { q: "سماء : نجوم", a: ["حديقة : أزهار", "بحر : لؤلؤ", "صحراء : رمال", "غابة : وحوش"], c: 1, r: "علاقة مكانية (تزين): النجوم تزين السماء واللؤلؤ يزين البحر." },
+    { q: "مِنجل : فلاح", a: ["مشرط : طبيب", "قلم : كاتب", "سيف : محارب", "مطرقة : حداد"], c: 3, r: "علاقة الأداة بصاحبها: المنجل للفلاح والمطرقة للحداد." },
+    { q: "غمد : سيف", a: ["عرين : أسد", "خاتم : إصبع", "جورب : قدم", "حقيبة : كتب"], c: 0, r: "علاقة مكانية: الغمد بيت السيف والعرين بيت الأسد." },
+    { q: "إهمال : فشل", a: ["ممارسة : إتقان", "سرعة : حادث", "توفير : غنى", "قراءة : ثقافة"], c: 1, r: "علاقة سببية: الإهمال يؤدي للفشل والسرعة تؤدي للحادث." },
+    { q: "نحل : عسل", a: ["بقرة : حليب", "دجاج : بيض", "غنم : صوف", "دودة : حرير"], c: 3, r: "علاقة نتاج: النحل ينتج العسل ودودة القز تنتج الحرير." },
+    { q: "سماء : نجوم", a: ["حديقة : أزهار", "بحر : لؤلؤ", "صحراء : رمال", "غابة : وحوش"], c: 1, r: "علاقة مكانية: النجوم تزين السماء واللؤلؤ يزين البحر." },
     { q: "شِعر : قافية", a: ["كتاب : فكرة", "بناء : أساس", "لوحة : إطار", "صلاة : تسليم"], c: 3, r: "علاقة نهاية: القافية تنتهي بها القصيدة والتسليم تنتهي به الصلاة." },
     { q: "حب : وئام", a: ["بغض : خصام", "فراق : هجر", "تعب : مرض", "عمل : إنتاج"], c: 0, r: "علاقة نتيجة: الحب يولد الوئام والبغض يولد الخصام." },
     { q: "مطر : سحاب", a: ["ضوء : مصباح", "حرارة : شمس", "ثمر : شجر", "دخان : نار"], c: 3, r: "علاقة مصدرية: المطر يصدر من السحاب والدخان يصدر من النار." },
-    { q: "رَسْو : سفينة", a: ["وقوف : سيارة", "إقلاع : طائرة", "هبوط : طائرة", "مشي : إنسان"], c: 2, r: "علاقة توقف المكانية: الرسوا هو توقف السفينة والهبوط هو توقف الطائرة." },
-    { q: "صلابة : ماس", a: ["ليونة : حرير", "خفة : ريش", "شفافية : زجاج", "سرعة : فهد"], c: 0, r: "علاقة صفة ملازمة: الماس يتصف بالصلابة والحرير يتصف بالليونة." },
-    { q: "يقظة : نوم", a: ["نهار : ليل", "بياض : سواد", "حياة : موت", "غنى : فقر"], c: 0, r: "علاقة تضاد (تعاقب): اليقظة عكس النوم وهما يتعاقبان كالنهار والليل." },
-    { q: "بَرَد : ثلج", a: ["غيم : مطر", "بحر : نهر", "تلة : جبل", "كوخ : قصر"], c: 2, r: "علاقة تدرج (حجم): البرد أصغر من الثلج والتلة أصغر من الجبل." },
-    { q: "تحدث : إنصات", a: ["قراءة : كتابة", "إرسال : استقبال", "صعود : نزول", "سؤال : جواب"], c: 1, r: "علاقة تواصل تبادلي: التحدث يقابله الإنصات والإرسال يقابله الاستقبال." },
-    { q: "خيط : ثوب", a: ["نواة : تمرة", "لبنة : جدار", "خرز : مسبحة", "حرف : كلمة"], c: 1, r: "علاقة جزء من كل (أساسي): الخيط ينسج الثوب واللبنة تبني الجدار." },
+    { q: "رَسْو : سفينة", a: ["وقوف : سيارة", "إقلاع : طائرة", "هبوط : طائرة", "مشي : إنسان"], c: 2, r: "علاقة توقف المكانية: الرسوا للسفينة والهبوط للطائرة." },
+    { q: "صلابة : ماس", a: ["ليونة : حرير", "خفة : ريش", "شفافية : زجاج", "سرعة : فهد"], c: 0, r: "علاقة صفة ملازمة: الماس يتصف بالصلابة والحرير بالليونة." },
+    { q: "يقظة : نوم", a: ["نهار : ليل", "بياض : سواد", "حياة : موت", "غنى : فقر"], c: 0, r: "علاقة تضاد وتعاقب: اليقظة عكس النوم وهما يتعاقبان كالنهار والليل." },
+    { q: "بَرَد : ثلج", a: ["غيم : مطر", "بحر : نهر", "تلة : جبل", "كوخ : قصر"], c: 2, r: "علاقة تدرج حجم: البرد أصغر من الثلج والتلة أصغر من الجبل." },
+    { q: "تحدث : إنصات", a: ["قراءة : كتابة", "إرسال : استقبال", "صعود : نزول", "سؤال : جواب"], c: 1, r: "علاقة تواصل: التحدث يقابله الإنصات والإرسال يقابله الاستقبال." },
+    { q: "خيط : ثوب", a: ["نواة : تمرة", "لبنة : جدار", "خرز : مسبحة", "حرف : كلمة"], c: 1, r: "علاقة جزء من كل: الخيط ينسج الثوب واللبنة تبني الجدار." },
     { q: "فروسية : ميدان", a: ["سباحة : مسبح", "تجارة : سوق", "دراسة : جامعة", "قنص : غابة"], c: 1, r: "علاقة ممارسة مكانية: الفروسية مكانها الميدان والتجارة مكانها السوق." }
 ];
 
@@ -95,7 +95,7 @@ let currentPos = 0, score = 0, stdName = "", records = [], timerId = null, timeL
 function initQuiz() {
     stdName = document.getElementById('name-input').value.trim();
     if(!stdName) return alert("لطفاً، اكتب اسمك أولاً!");
-    if(localStorage.getItem('qudurat_done')) return alert("نعتذر، يسمح بدخول الاختبار مرة واحدة فقط.");
+    if(localStorage.getItem('quiz_lock')) return alert("يسمح بدخول الاختبار مرة واحدة فقط.");
     
     document.getElementById('start-screen').style.display = "none";
     document.getElementById('quiz-ui').style.display = "block";
@@ -103,46 +103,39 @@ function initQuiz() {
     renderQuestion();
 }
 
-function startTimer() {
+function runTimer() {
     timeLeft = 30;
-    const timerDiv = document.getElementById('timer');
-    timerDiv.innerText = `${timeLeft} ث`;
-    timerDiv.classList.remove('timer-warn');
+    const timerBox = document.getElementById('timer-text');
+    timerBox.innerText = `${timeLeft} ث`;
+    timerBox.classList.remove('timer-warning');
     
     clearInterval(timerId);
     timerId = setInterval(() => {
         timeLeft--;
-        timerDiv.innerText = `${timeLeft} ث`;
-        if(timeLeft <= 5) timerDiv.classList.add('timer-warn');
+        timerBox.innerText = `${timeLeft} ث`;
+        if(timeLeft <= 5) timerBox.classList.add('timer-warning');
         if(timeLeft <= 0) {
             clearInterval(timerId);
-            autoSkip();
+            handleAutoSkip();
         }
     }, 1000);
-}
-
-function autoSkip() {
-    if(document.getElementById('next-btn').style.display === "block") return;
-    const data = quizData[currentPos];
-    records.push({q: data.q, user: "انتهى الوقت", correct: data.a[data.c], isCorrect: false, r: "لم يتم اختيار إجابة في الوقت المحدد. " + data.r});
-    nextQuestion();
 }
 
 function renderQuestion() {
     const data = quizData[currentPos];
     document.getElementById('quiz-content').innerHTML = `
-        <div class="progress">السؤال ${currentPos + 1} من ${quizData.length}</div>
+        <div style="color:#888; font-weight:bold; margin-bottom:10px;">السؤال ${currentPos + 1} من ${quizData.length}</div>
         <div class="question-box"><h3>${data.q}</h3></div>
-        <ul class="options-grid" id="opt-list">
-            ${data.a.map((opt, i) => `<li onclick="handleSelect(this, ${i})">${opt}</li>`).join('')}
+        <ul class="options-grid" id="opts">
+            ${data.a.map((opt, i) => `<li onclick="onSelect(this, ${i})">${opt}</li>`).join('')}
         </ul>
-        <div id="feedback-box" class="feedback"></div>
+        <div id="fb" class="feedback"></div>
     `;
     document.getElementById('next-btn').style.display = "none";
-    startTimer();
+    runTimer();
 }
 
-function handleSelect(el, idx) {
+function onSelect(el, idx) {
     if(document.getElementById('next-btn').style.display === "block") return;
     clearInterval(timerId);
     const data = quizData[currentPos];
@@ -152,44 +145,41 @@ function handleSelect(el, idx) {
     records.push({q: data.q, user: data.a[idx], correct: data.a[data.c], isCorrect, r: data.r});
     
     el.classList.add('selected');
-    const fb = document.getElementById('feedback-box');
+    const fb = document.getElementById('fb');
     fb.style.display = "block";
     fb.style.background = isCorrect ? "#d4edda" : "#f8d7da";
-    fb.style.color = isCorrect ? "#155724" : "#721c24";
-    fb.innerHTML = `<strong>${isCorrect ? 'أحسنت! ✅' : 'حاول مرة أخرى.. ❌'}</strong><br>${data.r}`;
-    
+    fb.innerHTML = `<strong>${isCorrect ? '✅ صح' : '❌ خطأ'}</strong><br>${data.r}`;
     document.getElementById('next-btn').style.display = "block";
 }
 
+function handleAutoSkip() {
+    if(document.getElementById('next-btn').style.display === "block") return;
+    records.push({q: quizData[currentPos].q, user: "انتهى الوقت", correct: quizData[currentPos].a[quizData[currentPos].c], isCorrect: false, r: "لم تجب في الوقت المحدد."});
+    nextQuestion();
+}
+
 function nextQuestion() {
-    clearInterval(timerId);
     currentPos++;
     if(currentPos < quizData.length) renderQuestion();
     else finalize();
 }
 
 function finalize() {
-    localStorage.setItem('qudurat_done', 'true');
+    localStorage.setItem('quiz_lock', 'true');
     document.getElementById('quiz-ui').style.display = "none";
     document.getElementById('results').style.display = "block";
     document.getElementById('score-box').innerText = `الدرجة النهائية: ${score} من ${quizData.length}`;
     
-    let html = "<h3>مراجعة الإجابات:</h3>";
+    let html = "<h4>مراجعة الإجابات والشرح:</h4>";
     records.forEach((rec, i) => {
-        html += `
-            <div class="summary-card">
-                <strong>${i+1}. ${rec.q}</strong><br>
-                إجابتك: <span style="color:${rec.isCorrect?'green':'red'}">${rec.user}</span> | 
-                ${!rec.isCorrect ? `الصحيحة: <span style="color:green">${rec.correct}</span>` : ''}<br>
-                <small>💡 ${rec.r}</small>
-            </div>
-        `;
+        html += `<div style="padding:10px; border-bottom:1px solid #eee;">
+            <strong>${i+1}. ${rec.q}</strong><br>
+            إجابتك: <span style="color:${rec.isCorrect?'green':'red'}">${rec.user}</span> | 
+            الصحيحة: <span style="color:green">${rec.correct}</span><br>
+            <small>💡 ${rec.r}</small>
+        </div>`;
     });
     document.getElementById('summary-list').innerHTML = html;
-    document.getElementById('final-footer').innerHTML = `
-        مع تمنياتي لك بمزيد من التقدم والنجاح 🌟<br>
-        <strong>أ / عبدالعزيز الفيفي</strong>
-    `;
 }
 </script>
 </body>
