@@ -7,11 +7,14 @@
     <style>
         :root { --primary: #2c3e50; --secondary: #3498db; --success: #27ae60; --danger: #e74c3c; --accent: #f39c12; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f7f6; margin: 0; padding: 20px; color: #333; }
-        .container { max-width: 800px; margin: auto; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-top: 8px solid var(--secondary); }
+        .container { max-width: 800px; margin: auto; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-top: 8px solid var(--secondary); position: relative; }
         .header { text-align: center; margin-bottom: 30px; }
-        .header h1 { color: var(--primary); font-size: 2.2em; margin-bottom: 10px; }
+        .header h1 { color: var(--primary); font-size: 2.2em; margin-bottom: 5px; }
         .school-info { font-size: 1.3em; color: var(--secondary); font-weight: bold; }
-        .student-board { background: #e8f4fd; padding: 15px; border-radius: 12px; margin-bottom: 25px; border-right: 6px solid var(--secondary); font-size: 1.1em; }
+        .student-board { background: #e8f4fd; padding: 15px; border-radius: 12px; margin-bottom: 25px; border-right: 6px solid var(--secondary); font-size: 1.1em; display: flex; justify-content: space-between; align-items: center; }
+        .timer-box { font-weight: bold; font-size: 1.2em; padding: 5px 15px; border-radius: 8px; background: white; border: 2px solid var(--secondary); min-width: 80px; text-align: center; }
+        .timer-warn { color: var(--danger); border-color: var(--danger); animation: blink 0.8s infinite; }
+        @keyframes blink { 50% { opacity: 0.5; } }
         .progress { color: #888; margin-bottom: 10px; font-weight: bold; }
         .question-box h3 { background: #f9f9f9; padding: 20px; border-radius: 10px; border: 1px dashed #ccc; margin-top: 0; }
         .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; list-style: none; padding: 0; }
@@ -36,19 +39,22 @@
     </div>
 
     <div id="start-screen">
-        <p style="text-align: center; font-size: 1.2em;">مرحباً بك يا بطل.. أدخل اسمك لبدء التحدي:</p>
+        <p style="text-align: center; font-size: 1.2em;">مرحباً بك يا بطل.. لديك 30 ثانية لكل سؤال، بالتوفيق!</p>
         <input type="text" id="name-input" placeholder="اكتب اسمك الثلاثي..." style="width: 100%; padding: 15px; box-sizing: border-box; border-radius: 10px; border: 2px solid #ddd; margin-bottom: 20px; font-size: 16px;">
         <button class="btn btn-start" onclick="initQuiz()">ابدأ الاختبار الآن 🚀</button>
     </div>
 
     <div id="quiz-ui" style="display:none;">
-        <div id="student-tag" class="student-board"></div>
+        <div class="student-board">
+            <span id="student-tag"></span>
+            <div id="timer" class="timer-box">30 ث</div>
+        </div>
         <div id="quiz-content"></div>
         <button id="next-btn" class="btn btn-next" onclick="nextQuestion()" style="display:none;">السؤال التالي ⬅️</button>
     </div>
 
     <div id="results" style="display:none;">
-        <h2 style="text-align: center; color: var(--success);">اكتمل الاختبار بنجاح! 🏁</h2>
+        <h2 style="text-align: center; color: var(--success);">اكتمل الاختبار! 🏁</h2>
         <div id="score-box" style="text-align: center; font-size: 1.8em; margin: 20px 0; font-weight: bold;"></div>
         <div id="summary-list"></div>
         <div class="footer-note" id="final-footer"></div>
@@ -57,13 +63,11 @@
 
 <script>
 const quizData = [
-    // سهل
     { q: "رئة : تنفس", a: ["قلب : ضخ", "معدة : هضم", "عين : رؤية", "أذن : سماع"], c: 0, r: "علاقة وظيفية: الرئة وظيفتها التنفس والقلب وظيفته الضخ." },
     { q: "أسد : زئير", a: ["حمام : هديل", "كلب : نباح", "قط : مواء", "ضفدع : نقيق"], c: 0, r: "علاقة الكائن بصوته: الزئير صوت الأسد والهديل صوت الحمام." },
     { q: "غابة : أشجار", a: ["بحر : سمك", "مدرسة : فصول", "كتاب : صفحات", "مدينة : ناس"], c: 2, r: "علاقة مكانية (احتواء): الغابة تضم أشجاراً والكتاب يضم صفحات." },
     { q: "نوم : راحة", a: ["مذاكرة : نجاح", "طعام : شبع", "عمل : تعب", "سفر : مشقة"], c: 1, r: "علاقة سببية: النوم يؤدي للراحة والطعام يؤدي للشبع." },
     { q: "ملعقة : أكل", a: ["قلم : كتابة", "سكين : قطع", "منشار : خشب", "مقص : قماش"], c: 0, r: "علاقة الأداة ووظيفتها: الملعقة تستخدم للأكل والقلم للكتابة." },
-    // متوسط
     { q: "محراب : مسجد", a: ["منبر : خطبة", "دفة : سفينة", "نافذة : غرفة", "باب : منزل"], c: 1, r: "علاقة جزء من كل (صدري): المحراب جزء في مقدمة المسجد والدفة جزء في مقدمة السفينة." },
     { q: "وسامة : جمال", a: ["قوة : شجاعة", "ذكاء : فطنة", "طول : عرض", "سرعة : حركة"], c: 1, r: "علاقة ترادف: الوسامة هي الجمال والذكاء هو الفطنة." },
     { q: "عجين : خبز", a: ["دقيق : قمح", "نخلة : رطب", "ماء : ثلج", "خشب : كرسي"], c: 2, r: "علاقة تحول: العجين يتحول لخبز والماء يتحول لثلج." },
@@ -74,7 +78,6 @@ const quizData = [
     { q: "إهمال : فشل", a: ["ممارسة : إتقان", "سرعة : حادث", "توفير : غنى", "قراءة : ثقافة"], c: 1, r: "علاقة سببية (سلبية غالباً): الإهمال يؤدي للفشل والسرعة تؤدي للحادث." },
     { q: "نحل : عسل", a: ["بقرة : حليب", "دجاج : بيض", "غنم : صوف", "دودة : حرير"], c: 3, r: "علاقة نتاج (طبيعي): النحل ينتج العسل ودودة القز تنتج الحرير." },
     { q: "سماء : نجوم", a: ["حديقة : أزهار", "بحر : لؤلؤ", "صحراء : رمال", "غابة : وحوش"], c: 1, r: "علاقة مكانية (تزين): النجوم تزين السماء واللؤلؤ يزين البحر." },
-    // صعب
     { q: "شِعر : قافية", a: ["كتاب : فكرة", "بناء : أساس", "لوحة : إطار", "صلاة : تسليم"], c: 3, r: "علاقة نهاية: القافية تنتهي بها القصيدة والتسليم تنتهي به الصلاة." },
     { q: "حب : وئام", a: ["بغض : خصام", "فراق : هجر", "تعب : مرض", "عمل : إنتاج"], c: 0, r: "علاقة نتيجة: الحب يولد الوئام والبغض يولد الخصام." },
     { q: "مطر : سحاب", a: ["ضوء : مصباح", "حرارة : شمس", "ثمر : شجر", "دخان : نار"], c: 3, r: "علاقة مصدرية: المطر يصدر من السحاب والدخان يصدر من النار." },
@@ -87,12 +90,12 @@ const quizData = [
     { q: "فروسية : ميدان", a: ["سباحة : مسبح", "تجارة : سوق", "دراسة : جامعة", "قنص : غابة"], c: 1, r: "علاقة ممارسة مكانية: الفروسية مكانها الميدان والتجارة مكانها السوق." }
 ];
 
-let currentPos = 0, score = 0, stdName = "", records = [];
+let currentPos = 0, score = 0, stdName = "", records = [], timerId = null, timeLeft = 30;
 
 function initQuiz() {
     stdName = document.getElementById('name-input').value.trim();
     if(!stdName) return alert("لطفاً، اكتب اسمك أولاً!");
-    if(localStorage.getItem('qudurat_done')) return alert("نعتذر، يسمح بدخول الاختبار مرة واحدة فقط من نفس الجهاز.");
+    if(localStorage.getItem('qudurat_done')) return alert("نعتذر، يسمح بدخول الاختبار مرة واحدة فقط.");
     
     document.getElementById('start-screen').style.display = "none";
     document.getElementById('quiz-ui').style.display = "block";
@@ -100,21 +103,48 @@ function initQuiz() {
     renderQuestion();
 }
 
+function startTimer() {
+    timeLeft = 30;
+    const timerDiv = document.getElementById('timer');
+    timerDiv.innerText = `${timeLeft} ث`;
+    timerDiv.classList.remove('timer-warn');
+    
+    clearInterval(timerId);
+    timerId = setInterval(() => {
+        timeLeft--;
+        timerDiv.innerText = `${timeLeft} ث`;
+        if(timeLeft <= 5) timerDiv.classList.add('timer-warn');
+        if(timeLeft <= 0) {
+            clearInterval(timerId);
+            autoSkip();
+        }
+    }, 1000);
+}
+
+function autoSkip() {
+    if(document.getElementById('next-btn').style.display === "block") return;
+    const data = quizData[currentPos];
+    records.push({q: data.q, user: "انتهى الوقت", correct: data.a[data.c], isCorrect: false, r: "لم يتم اختيار إجابة في الوقت المحدد. " + data.r});
+    nextQuestion();
+}
+
 function renderQuestion() {
     const data = quizData[currentPos];
     document.getElementById('quiz-content').innerHTML = `
         <div class="progress">السؤال ${currentPos + 1} من ${quizData.length}</div>
         <div class="question-box"><h3>${data.q}</h3></div>
-        <ul class="options-grid">
+        <ul class="options-grid" id="opt-list">
             ${data.a.map((opt, i) => `<li onclick="handleSelect(this, ${i})">${opt}</li>`).join('')}
         </ul>
         <div id="feedback-box" class="feedback"></div>
     `;
     document.getElementById('next-btn').style.display = "none";
+    startTimer();
 }
 
 function handleSelect(el, idx) {
     if(document.getElementById('next-btn').style.display === "block") return;
+    clearInterval(timerId);
     const data = quizData[currentPos];
     const isCorrect = (idx === data.c);
     if(isCorrect) score++;
@@ -132,6 +162,7 @@ function handleSelect(el, idx) {
 }
 
 function nextQuestion() {
+    clearInterval(timerId);
     currentPos++;
     if(currentPos < quizData.length) renderQuestion();
     else finalize();
